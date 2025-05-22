@@ -24,7 +24,7 @@ const ExpenseBreakdown = () => {
 
     const categoryMap = {};
     const expenses = transactions.filter(t => t?.type === 'expense');
-    const totalExpenses = Number(summary.totalExpenses) || 1; // Make sure this is the correct property name from your reducer
+    const totalExpenses = Number(summary.totalExpenses) || 1; 
 
     expenses.forEach(transaction => {
       if (!transaction?.category) return;
