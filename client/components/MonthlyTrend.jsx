@@ -2,12 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 const MonthlyTrend = () => {
-  // Sample data - replace with props later
+  
   const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
   const incomeData = [1200, 800, 1500, 900];
   const expenseData = [750, 600, 950, 500];
   
-  // Calculate max value for scaling
+  
   const maxValue = Math.max(...incomeData, ...expenseData);
 
   return (
@@ -15,7 +15,7 @@ const MonthlyTrend = () => {
       <Text style={styles.title}>Monthly Trend</Text>
       
       <View style={styles.chartContainer}>
-        {/* Legend */}
+        
         <View style={styles.legendContainer}>
           <View style={styles.legendItem}>
             <View style={[styles.legendColor, { backgroundColor: '#4ADE80' }]} />
@@ -27,21 +27,21 @@ const MonthlyTrend = () => {
           </View>
         </View>
 
-        {/* Bars */}
+      
         <View style={styles.barsContainer}>
           {weeks.map((week, index) => (
             <View key={index} style={styles.weekContainer}>
               <Text style={styles.weekLabel}>{week}</Text>
               
               <View style={styles.barGroup}>
-                {/* Income Bar */}
+                
                 <View style={[styles.bar, styles.incomeBar, { 
                   height: `${(incomeData[index] / maxValue) * 100}%` 
                 }]}>
                   <Text style={styles.barValue}>${incomeData[index]}</Text>
                 </View>
                 
-                {/* Expense Bar */}
+               
                 <View style={[styles.bar, styles.expenseBar, { 
                   height: `${(expenseData[index] / maxValue) * 100}%` 
                 }]}>
