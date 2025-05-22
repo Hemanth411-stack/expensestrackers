@@ -10,15 +10,13 @@ const DateBalance = () => {
   const { summary, status } = useSelector(state => state.transactions);
   const [currentDate, setCurrentDate] = React.useState(new Date());
 
-  // Month names array
+
   const monthNames = ["January", "February", "March", "April", "May", "June",
                      "July", "August", "September", "October", "November", "December"];
 
-  // Format month and year for display
   const displayMonth = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
   const balance = summary?.balance || 0;
 
-  // Handle month navigation
   const changeMonth = (direction) => {
     const newDate = new Date(currentDate);
     if (direction === 'prev') {
@@ -27,15 +25,14 @@ const DateBalance = () => {
       newDate.setMonth(newDate.getMonth() + 1);
     }
     setCurrentDate(newDate);
-    
-    // Get month number (1-12) and year for the API call
+
     const monthNumber = newDate.getMonth() + 1;
     const year = newDate.getFullYear();
     
     dispatch(fetchTransactions({ month: monthNumber, year }));
   };
 
-  // Load transactions for current month on initial render
+
   React.useEffect(() => {
     const monthNumber = currentDate.getMonth() + 1;
     const year = currentDate.getFullYear();
