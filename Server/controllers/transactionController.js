@@ -1,6 +1,5 @@
 import Transaction from "../models/Transcation.js";
 
-// Helper to convert month name to number
 const monthNameToNumber = {
   January: 1,
   February: 2,
@@ -20,7 +19,7 @@ export const getTransactions = async (req, res) => {
   try {
     const { month, year } = req.query;
 
-    // If no filter, return all
+
     if (!month || !year) {
       const allTransactions = await Transaction.find();
       return res.status(200).json(allTransactions);
@@ -41,7 +40,7 @@ export const getTransactions = async (req, res) => {
       },
     });
 
-    // Calculate income, expenses, and balance
+   
     let totalIncome = 0;
     let totalExpenses = 0;
 
