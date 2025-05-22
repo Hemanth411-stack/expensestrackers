@@ -8,7 +8,7 @@ const RecentTransactions = () => {
   const navigation = useNavigation();
   const { transactions = [] } = useSelector(state => state.transactions);
 
-  // Sort transactions by date (newest first) and limit to 5 most recent
+ 
   const recentTransactions = [...transactions]
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, 5);
