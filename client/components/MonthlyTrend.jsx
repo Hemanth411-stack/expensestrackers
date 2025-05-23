@@ -1,53 +1,113 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { useSelector } from 'react-redux';
+import { LinearGradient } from 'expo-linear-gradient';
+
+const { width } = Dimensions.get('window');
 
 const MonthlyTrend = () => {
-  
-  const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-  const incomeData = [1200, 800, 1500, 900];
-  const expenseData = [750, 600, 950, 500];
-  
-  
-  const maxValue = Math.max(...incomeData, ...expenseData);
+  const { transactions } = useSelector(state => state.transactions);
+
+  const processWeeklyData = () => {
+    const weeklyData = {
+      'Week 1': { income: 0, expenses: 0 },
+      'Week 2': { income: 0, expenses: 0 },
+      'Week 3': { income: 0, expenses: 0 },
+      'Week 4': { income: 0, expenses: 0 },
+    };
+
+    transactions.forEach(transaction => {
+      const transactionDate = new Date(transaction.date);
+      const dayOfMonth = transactionDate.getDate();
+      const weekNumber = Math.min(Math.floor(dayOfMonth / 7) + 1, 4);
+      const weekKey = `Week ${weekNumber}`;
+      
+      if (transaction.type === 'income') {
+        weeklyData[weekKey].income += transaction.amount;
+      } else {
+        weeklyData[weekKey].expenses += transaction.amount;
+      }
+    });
+
+    return {
+      weeks: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+      incomeData: Object.values(weeklyData).map(week => week.income),
+      expenseData: Object.values(weeklyData).map(week => week.expenses),
+    };
+  };
+
+  const { weeks, incomeData, expenseData } = processWeeklyData();
+  const maxValue = Math.max(...incomeData, ...expenseData, 1);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Monthly Trend</Text>
       
+      <View style={styles.legendContainer}>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendColor, { backgroundColor: '#34D399' }]} />
+          <Text style={styles.legendText}>Income</Text>
+        </View>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendColor, { backgroundColor: '#F87171' }]} />
+          <Text style={styles.legendText}>Expenses</Text>
+        </View>
+      </View>
+
       <View style={styles.chartContainer}>
-        
-        <View style={styles.legendContainer}>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendColor, { backgroundColor: '#4ADE80' }]} />
-            <Text style={styles.legendText}>Income</Text>
-          </View>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendColor, { backgroundColor: '#F87171' }]} />
-            <Text style={styles.legendText}>Expenses</Text>
-          </View>
+        {/* Grid Lines */}
+        <View style={styles.gridContainer}>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.gridLine,
+                { bottom: `${(index / 4) * 100}%` },
+              ]}
+            />
+          ))}
         </View>
 
-      
         <View style={styles.barsContainer}>
           {weeks.map((week, index) => (
-            <View key={index} style={styles.weekContainer}>
-              <Text style={styles.weekLabel}>{week}</Text>
-              
+            <View key={index} style={styles.weekColumn}>
               <View style={styles.barGroup}>
+                {/* Income Bar */}
+                {incomeData[index] > 0 && (
+                  <View style={styles.singleBarContainer}>
+                    <LinearGradient
+                      colors={['#34D399', '#6EE7B7']}
+                      style={[
+                        styles.bar,
+                        styles.incomeBar,
+                        { height: `${(incomeData[index] / maxValue) * 80}%` },
+                      ]}
+                    />
+                    <Text style={[styles.barValue, styles.incomeValue]}>
+                      ${incomeData[index].toFixed(0)}
+                    </Text>
+                  </View>
+                )}
                 
-                <View style={[styles.bar, styles.incomeBar, { 
-                  height: `${(incomeData[index] / maxValue) * 100}%` 
-                }]}>
-                  <Text style={styles.barValue}>${incomeData[index]}</Text>
-                </View>
-                
-               
-                <View style={[styles.bar, styles.expenseBar, { 
-                  height: `${(expenseData[index] / maxValue) * 100}%` 
-                }]}>
-                  <Text style={styles.barValue}>${expenseData[index]}</Text>
-                </View>
+                {/* Expense Bar */}
+                {expenseData[index] > 0 && (
+                  <View style={styles.singleBarContainer}>
+                    <LinearGradient
+                      colors={['#F87171', '#FCA5A5']}
+                      style={[
+                        styles.bar,
+                        styles.expenseBar,
+                        { height: `${(expenseData[index] / maxValue) * 80}%` },
+                      ]}
+                    />
+                    <Text style={[styles.barValue, styles.expenseValue]}>
+                      ${expenseData[index].toFixed(0)}
+                    </Text>
+                  </View>
+                )}
               </View>
+
+              <Text style={styles.weekLabel}>{week}</Text>
             </View>
           ))}
         </View>
@@ -58,85 +118,111 @@ const MonthlyTrend = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    margin: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 16,
+    marginVertical: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
   },
   title: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: '700',
     color: '#1F2937',
+    fontFamily: 'System',
     marginBottom: 16,
-  },
-  chartContainer: {
-    marginTop: 8,
   },
   legendContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     marginBottom: 16,
-    gap: 16,
+    gap: 24,
   },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   legendColor: {
-    width: 12,
-    height: 12,
-    borderRadius: 2,
-    marginRight: 6,
+    width: 14,
+    height: 14,
+    borderRadius: 4,
+    marginRight: 8,
   },
   legendText: {
-    fontSize: 12,
+    fontSize: 14,
+    fontWeight: '500',
     color: '#4B5563',
+  },
+  chartContainer: {
+    height: 280,
+    position: 'relative',
+  },
+  gridContainer: {
+    position: 'absolute',
+    width: '100%',
+    height: '80%',
+    top: 30,
+  },
+  gridLine: {
+    position: 'absolute',
+    width: '100%',
+    height: 1,
+    backgroundColor: '#E5E7EB',
+    opacity: 0.5,
   },
   barsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    height: 200,
-    paddingTop: 16,
+    height: '100%',
   },
-  weekContainer: {
-    alignItems: 'center',
+  weekColumn: {
     flex: 1,
-  },
-  weekLabel: {
-    fontSize: 10,
-    color: '#6B7280',
-    marginBottom: 8,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    height: '100%',
   },
   barGroup: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'flex-end',
-    width: '100%',
-    paddingHorizontal: 4,
+    width: '90%',
+    height: '80%',
+    marginBottom: 24,
   },
-  bar: {
+  singleBarContainer: {
     flex: 1,
     marginHorizontal: 2,
-    borderRadius: 4,
-    justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingBottom: 4,
+    justifyContent: 'flex-end',
   },
-  incomeBar: {
-    backgroundColor: '#4ADE80',
-  },
-  expenseBar: {
-    backgroundColor: '#F87171',
+  bar: {
+    width: '80%',
+    borderRadius: 6,
+    minHeight: 4,
   },
   barValue: {
     fontSize: 10,
-    color: 'white',
-    fontWeight: 'bold',
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  incomeValue: {
+    color: '#34D399',
+  },
+  expenseValue: {
+    color: '#F87171',
+  },
+  weekLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#6B7280',
+    marginTop: 8,
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    textAlign: 'center',
   },
 });
 
